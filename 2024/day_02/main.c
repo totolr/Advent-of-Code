@@ -37,7 +37,8 @@ int main()
 
   char line[line_count]; // Buffer pour stocker une ligne
   int number;
-  int nb_safe = 0;
+  int nb_safe_part1 = 0;
+  int nb_safe_part2 = 0;
 
   // Lire le fichier ligne par ligne
   while (fgets(line, sizeof(line), file) != NULL)
@@ -49,7 +50,7 @@ int main()
     while (sscanf(ptr, "%d", &number) == 1)
     {
       level[i++] = number;
-      printf("%d ", number); // Afficher ou stocker le nombre
+      printf("%d ", number);
       // Avancer le pointeur après le nombre extrait
       while (*ptr != ' ' && *ptr != '\n' && *ptr != '\0')
       {
@@ -102,15 +103,96 @@ int main()
     if (safe)
     {
       printf("Safe");
-      nb_safe++;
+      nb_safe_part1++;
+      nb_safe_part2++;
     }
     else
     {
       printf("Unsafe");
     }
     printf("\n"); // Nouvelle ligne après avoir traité une ligne du fichier
+
+    if (!safe)
+    {
+      int new_level[9];
+
+      for (int j = 0; j < 9; j++)
+      {
+        croissant = false;
+        decroissant = false;
+        for (int i = 0; i < 8; i++)
+        {
+          new_level[i] = level[i];
+        }
+        new_level[8] = 0;
+        if (new_level[j] == 0)
+        {
+          break;
+        }
+        for (int k = j; k < 8; k++)
+        {
+          new_level[k] = new_level[k + 1];
+        }
+        for (int l = 0; new_level[l] != 0; l++)
+        {
+          printf("%d ", new_level[l]);
+        }
+
+        if (new_level[1] > new_level[0])
+        {
+          croissant = true;
+        }
+        else if (new_level[1] < new_level[0])
+        {
+          decroissant = true;
+        }
+        for (int m = 1; m < 9; m++)
+        {
+          if (new_level[m] == 0)
+          {
+            break;
+          }
+
+          if (new_level[m] > new_level[m - 1] && croissant)
+          {
+            safe = true;
+          }
+          else if (new_level[m] < new_level[m - 1] && decroissant)
+          {
+            safe = true;
+          }
+          else
+          {
+            safe = false;
+            break;
+          }
+          if ((new_level[m] - new_level[m - 1]) <= 3 && (new_level[m] - new_level[m - 1]) >= -3)
+          {
+            safe = true;
+          }
+          else
+          {
+            safe = false;
+            break;
+          }
+        }
+        if (safe)
+        {
+          printf("Safe\n");
+          nb_safe_part2++;
+          break;
+        }
+        else
+        {
+          printf("Unsafe\n");
+        }
+      }
+
+      printf("\n");
+    }
   }
-  printf("Nombre de lignes safe : %d\n", nb_safe);
+  printf("Nombre de lignes safe partie 1 : %d\n", nb_safe_part1);
+  printf("Nombre de lignes safe partie 2 : %d\n", nb_safe_part2);
 
   fclose(file);
 }
